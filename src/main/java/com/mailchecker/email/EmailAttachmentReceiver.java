@@ -65,7 +65,6 @@ public class EmailAttachmentReceiver extends Thread {
             logger.debug("Connected using POP3 protocol");
         } catch (Exception e1){
             String protocol = "imap";
-            port = "993";
             properties = new Properties();
             properties.put(String.format("mail.%s.host", protocol), "imap." + host);
             properties.put(String.format("mail.%s.port", protocol), port);
@@ -100,19 +99,19 @@ public class EmailAttachmentReceiver extends Thread {
                 String subject = message.getSubject();
                 String sentDate = message.getSentDate().toString();
                 String contentType = message.getContentType();
+                com.mailchecker.dto.Message messageToSave = new com.mailchecker.dto.Message();
+                messageToSave.setSender(from);
+                messageToSave.setSubject(subject);
+                messageToSave.setSentDate(message.getSentDate());
 
                 if (contentType.contains("multipart")) {
                     String messageContent = "";
                     String attachFiles = "";
+                    messageToSave.setMessageContent(messageContent);
 
                     Multipart multiPart = (Multipart) message.getContent();
                     int numberOfParts = multiPart.getCount();
                     for (int partCount = 0; partCount < numberOfParts; partCount++) {
-                        com.mailchecker.dto.Message messageToSave = new com.mailchecker.dto.Message();
-                        messageToSave.setSender(from);
-                        messageToSave.setMessageContent(messageContent);
-                        messageToSave.setSubject(subject);
-                        messageToSave.setSentDate(message.getSentDate());
                         MimeBodyPart part = (MimeBodyPart) multiPart.getBodyPart(partCount);
                         if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition())) {
                             String fileName = part.getFileName();
@@ -126,16 +125,17 @@ public class EmailAttachmentReceiver extends Thread {
                             logger.info("\t Attachments: " + attachFiles);
                             messageToSave.getAttachedFiles().add(new StoredAttachment(fileName));
                         }
-                        if (!messageMap.containsValue(messageToSave)){
-                            messageMap.put(from, messageToSave);
-                            try{
-                                messageService.add(messageToSave);
-                            }catch (NullPointerException e){
-                                logger.error("MessageService is not autowired");
-                            }
-                        }
                     }
                 }
+                if (!messageMap.containsValue(messageToSave)){
+                    messageMap.put(from, messageToSave);
+                    try{
+                        messageService.add(messageToSave);
+                    }catch (NullPointerException e){
+                        logger.error("MessageService is not autowired");
+                    }
+                }
+
             }
             folderInbox.close(false);
             store.close();

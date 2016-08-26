@@ -3,6 +3,7 @@ package com.mailchecker.dto;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * Created by Bohdan on 25.08.2016.
@@ -45,5 +46,15 @@ public class StoredAttachment {
     }
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(filePath);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return Objects.equals(this.filePath, obj);
     }
 }

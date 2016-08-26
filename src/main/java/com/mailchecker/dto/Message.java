@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Bohdan on 24.08.2016.
@@ -64,5 +65,23 @@ public class Message {
     }
     public void setAttachedFiles(List<StoredAttachment> attachedFiles) {
         this.attachedFiles = attachedFiles;
+    }
+
+    @Override
+    public int hashCode() {
+        Objects.hash(sender, subject, messageContent, sentDate, attachedFiles);
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Message)) return false;
+        Message msg = (Message) obj;
+        if (this==msg) return true;
+        return Objects.equals(this.sender, msg.sender) &&
+                Objects.equals(this.subject, msg.subject) &&
+                Objects.equals(this.messageContent, msg.messageContent) &&
+                Objects.equals(this.sentDate, msg.sentDate) &&
+                Objects.equals(this.attachedFiles, msg.attachedFiles);
     }
 }
