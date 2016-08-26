@@ -40,7 +40,7 @@ public class DataConfigTest {
             statement.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
             statement.execute();
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT id, sender FROM messages");
+            ResultSet rs = stmt.executeQuery("SELECT message_id, sender FROM messages");
             while (rs.next()) {
                 String id = rs.getString(1);
                 String sender = rs.getString(2);
