@@ -1,11 +1,13 @@
 package com.mailchecker.email;
 
 import com.mailchecker.dto.StoredAttachment;
+import com.mailchecker.repository.MessageRepository;
 import com.mailchecker.service.MessageService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +36,8 @@ public class EmailAttachmentReceiver extends Thread {
     final static Logger logger = Logger.getLogger(EmailAttachmentReceiver.class);
     @Autowired
     private MessageService messageService;
+    @Autowired
+    private MessageRepository messageRepository;
 
     public void setSaveDirectory(String dir) {
         this.saveDirectory = dir;
@@ -116,7 +120,15 @@ public class EmailAttachmentReceiver extends Thread {
                         if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition())) {
                             String fileName = part.getFileName();
                             attachFiles += fileName + ", ";
-                            part.saveFile(saveDirectory + File.separator + fileName);
+                            try {
+                                part.saveFile(saveDirectory + File.separator + fileName);
+                            }catch (FileNotFoundException e){
+                                String newGeneratedName = UUID.randomUUID().toString();
+                                part.saveFile(saveDirectory + File.separator + newGeneratedName);
+                                logger.warn("File attachment name was replaced from: " + fileName
+                                        + " to: " + newGeneratedName + " Reason: ", e);
+                                fileName = newGeneratedName;
+                            }
                             logger.info("Message #" + (i + 1) + ":");
                             logger.info("\t From: " + from);
                             logger.info("\t Subject: " + subject);

@@ -1,5 +1,5 @@
 CREATE TABLE messages (
-  id                  bigint auto_increment PRIMARY KEY,
+  message_id                  bigint auto_increment PRIMARY KEY,
   sender              VARCHAR(100),
   subject             VARCHAR(255),
   messageContent      TEXT,
@@ -7,7 +7,7 @@ CREATE TABLE messages (
 );
 
 CREATE TABLE stored_attachments (
-  id                  bigint auto_increment PRIMARY KEY,
-  message_id          INT,
-  file_path           VARCHAR(100)
+  stored_attachment_id bigint auto_increment PRIMARY KEY,
+  message_id           INT,
+  file_path            VARCHAR(100)
 );

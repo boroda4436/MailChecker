@@ -1,6 +1,7 @@
 package com.mailchecker.dto;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.context.annotation.Lazy;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public class Message {
     @Id
     @GeneratedValue(generator = "increment")
     @GenericGenerator(name= "increment", strategy= "increment")
-    @Column(name = "id", length = 6, nullable = false)
+    @Column(name = "message_id", length = 6, nullable = false)
     private Long id;
     @Column(name = "sender")
     private String sender;
@@ -25,7 +26,7 @@ public class Message {
     private String subject;
     @Column(name = "messageContent")
     private String messageContent;
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "message", cascade = CascadeType.ALL)
     private List<StoredAttachment> attachedFiles = new ArrayList<>();
     @Column(name = "sentDate")
     private Date sentDate;
